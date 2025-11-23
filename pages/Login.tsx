@@ -4,14 +4,15 @@ import { Coffee, Lock, User } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const { login } = useAuth();
   const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const success = login(username);
+    const success = login(username, password);
     if (!success) {
-      setError('Invalid credentials. Try "admin" or "cashier".');
+      setError('Invalid credentials. Please try again.');
     }
   };
 
@@ -43,6 +44,23 @@ export const Login: React.FC = () => {
               />
             </div>
           </div>
+
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="password"
+                required
+                className="block w-full pl-10 py-3 border border-gray-300 rounded-lg focus:ring-[#004D40] focus:border-[#004D40] transition-colors"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          </div>
           
           {error && (
             <div className="bg-red-50 border-l-4 border-red-500 p-4">
@@ -51,8 +69,8 @@ export const Login: React.FC = () => {
           )}
 
           <div className="text-sm text-gray-500 text-center bg-gray-50 p-3 rounded border">
-            <p>Demo Credentials:</p>
-            <p>Admin: <strong>admin</strong> | Cashier: <strong>cashier</strong></p>
+            <p>Default Password: <strong>123</strong></p>
+            <p className="text-xs mt-1">Admin: <strong>admin</strong> | Cashier: <strong>cashier</strong></p>
           </div>
 
           <button

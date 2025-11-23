@@ -8,12 +8,13 @@ export interface User {
   username: string;
   role: Role;
   name: string;
+  password?: string; // In a real app, this would be a hash
 }
 
 export interface Product {
   id: number;
   name: string;
-  category: 'Coffee' | 'Non-Coffee' | 'Hot Espresso' | 'Snack';
+  category: 'Coffee Based' | 'Non-Coffee Based' | 'Hot Espresso' | 'Add Ons';
   price: number;
   stock: number;
   image?: string;

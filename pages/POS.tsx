@@ -2,8 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useAuth } from '../context/AuthContext';
 import { CartItem, Product } from '../types';
-// Fix: Import ShoppingCart from lucide-react as it is used in the component
-import { Search, Trash2, Plus, Minus, CreditCard, AlertCircle, Receipt, ShoppingCart } from 'lucide-react';
+import { Search, Trash2, Plus, Minus, CreditCard, AlertCircle, Receipt, ShoppingCart, X } from 'lucide-react';
 
 export const POS: React.FC = () => {
   const { products, processSale } = useStore();
@@ -14,7 +13,17 @@ export const POS: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
-  const [lastSaleTotal, setLastSaleTotal] = useState(0);
+  
+  // Receipt Data State
+  const [receiptData, setReceiptData] = useState<{
+    items: CartItem[];
+    subtotal: number;
+    tax: number;
+    total: number;
+    cashier: string;
+    date: string;
+    id: string;
+  } | null>(null);
 
   // Filter products
   const filteredProducts = useMemo(() => {
@@ -63,6 +72,20 @@ export const POS: React.FC = () => {
 
   const handleCheckout = () => {
     setIsProcessing(true);
+    const saleId = Date.now().toString().slice(-6); // Mock short ID
+    const saleDate = new Date().toLocaleString();
+    
+    // Prepare Receipt Data before clearing cart
+    const currentReceiptData = {
+        items: [...cart],
+        subtotal,
+        tax,
+        total,
+        cashier: user?.name || 'Unknown',
+        date: saleDate,
+        id: saleId
+    };
+
     setTimeout(() => {
       processSale(
         cart.map(item => ({
@@ -74,7 +97,8 @@ export const POS: React.FC = () => {
         total, 
         user?.name || 'Unknown'
       );
-      setLastSaleTotal(total);
+      
+      setReceiptData(currentReceiptData);
       setCart([]);
       setIsProcessing(false);
       setShowReceipt(true);
@@ -235,20 +259,85 @@ export const POS: React.FC = () => {
       </div>
 
       {/* Receipt Modal */}
-      {showReceipt && (
+      {showReceipt && receiptData && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-sm p-6 text-center">
-             <div className="h-16 w-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Receipt className="h-8 w-8" />
+          <div className="bg-white w-full max-w-sm p-0 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+             {/* Receipt jagged edge top */}
+             <div className="h-4 bg-[#2D3748] w-full absolute -top-2 left-0 z-0"></div>
+
+             <div className="p-6 relative z-10 bg-white">
+                <button 
+                  onClick={() => setShowReceipt(false)} 
+                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                >
+                    <X className="h-5 w-5" />
+                </button>
+
+                <div className="text-center mb-6">
+                    <h2 className="text-2xl font-bold tracking-tight text-gray-900 uppercase">Lumina Coffee</h2>
+                    <p className="text-xs text-gray-500">123 Espresso Ave, Coffee City</p>
+                    <p className="text-xs text-gray-500">Tel: +1 (555) 123-4567</p>
+                </div>
+
+                <div className="border-b-2 border-dashed border-gray-200 pb-4 mb-4">
+                    <div className="flex justify-between text-xs text-gray-500 mb-1">
+                        <span>Date: {receiptData.date}</span>
+                        <span>#{receiptData.id}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500">
+                        <span>Cashier:</span>
+                        <span className="font-bold text-gray-700">{receiptData.cashier}</span>
+                    </div>
+                </div>
+
+                <div className="space-y-2 mb-6 max-h-60 overflow-y-auto pr-1">
+                    {receiptData.items.map((item, idx) => (
+                        <div key={idx} className="flex justify-between text-sm">
+                            <span className="text-gray-800 w-2/3 truncate">
+                                {item.quantity}x {item.name}
+                            </span>
+                            <span className="text-gray-900 font-medium">
+                                ${(item.price * item.quantity).toFixed(2)}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="border-t-2 border-dashed border-gray-200 pt-4 space-y-1">
+                    <div className="flex justify-between text-sm text-gray-600">
+                        <span>Subtotal</span>
+                        <span>${receiptData.subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-gray-600">
+                        <span>Tax (12%)</span>
+                        <span>${receiptData.tax.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-lg font-bold text-gray-900 pt-2">
+                        <span>TOTAL</span>
+                        <span>${receiptData.total.toFixed(2)}</span>
+                    </div>
+                </div>
+
+                <div className="mt-8 text-center space-y-2">
+                    <div className="flex justify-center">
+                       {/* Barcode simulation */}
+                       <div className="h-12 bg-gray-800 w-48 flex items-center justify-center text-white text-xs tracking-widest">
+                           ||| || ||| | ||||
+                       </div>
+                    </div>
+                    <p className="text-xs text-gray-400">Thank you for your business!</p>
+                </div>
              </div>
-             <h2 className="text-2xl font-bold text-gray-800 mb-2">Payment Successful</h2>
-             <p className="text-gray-500 mb-6">Total Amount: <span className="font-bold text-gray-900">${lastSaleTotal.toFixed(2)}</span></p>
-             <button 
-               onClick={() => setShowReceipt(false)}
-               className="w-full bg-[#004D40] text-white py-2 rounded-lg hover:bg-[#00695C]"
-             >
-               New Transaction
-             </button>
+             
+             {/* Print Button */}
+             <div className="bg-gray-50 p-4 border-t border-gray-100 flex gap-2">
+                 <button 
+                   onClick={() => setShowReceipt(false)}
+                   className="flex-1 bg-[#004D40] text-white py-2 rounded-lg hover:bg-[#00695C] text-sm font-bold shadow-sm"
+                 >
+                   New Order
+                 </button>
+             </div>
           </div>
         </div>
       )}

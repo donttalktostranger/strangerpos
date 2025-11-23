@@ -6,6 +6,7 @@ import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { POS } from './pages/POS';
 import { Inventory } from './pages/Inventory';
+import { Users } from './pages/Users';
 import { Role } from './types';
 
 // Private Route wrapper for Admin only pages
@@ -27,6 +28,11 @@ function AppRoutes() {
         <Route path="/inventory" element={
             <AdminRoute>
                 <Inventory />
+            </AdminRoute>
+        } />
+        <Route path="/users" element={
+            <AdminRoute>
+                <Users />
             </AdminRoute>
         } />
         <Route path="*" element={<Navigate to="/pos" />} />

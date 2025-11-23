@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ShoppingCart, Package, LogOut, Coffee } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Package, LogOut, Coffee, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Role } from '../types';
 import { useStore } from '../context/StoreContext';
@@ -45,17 +45,23 @@ export const Sidebar: React.FC = () => {
         </Link>
 
         {user?.role === Role.ADMIN && (
-          <Link to="/inventory" className={navClass('/inventory')}>
-            <div className="relative">
-               <Package className="h-5 w-5" />
-               {lowStockCount > 0 && (
-                 <span className="absolute -top-2 -right-2 h-4 w-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center animate-pulse">
-                   {lowStockCount}
-                 </span>
-               )}
-            </div>
-            Inventory
-          </Link>
+          <>
+            <Link to="/inventory" className={navClass('/inventory')}>
+              <div className="relative">
+                 <Package className="h-5 w-5" />
+                 {lowStockCount > 0 && (
+                   <span className="absolute -top-2 -right-2 h-4 w-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center animate-pulse">
+                     {lowStockCount}
+                   </span>
+                 )}
+              </div>
+              Inventory
+            </Link>
+            <Link to="/users" className={navClass('/users')}>
+              <Users className="h-5 w-5" />
+              Manage Users
+            </Link>
+          </>
         )}
       </nav>
 

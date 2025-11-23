@@ -10,12 +10,12 @@ export const Inventory: React.FC = () => {
 
   // Form State
   const [formData, setFormData] = useState<Partial<Product>>({
-    name: '', category: 'Coffee', price: 0, stock: 0
+    name: '', category: 'Coffee Based', price: 0, stock: 0
   });
 
   const handleOpenAdd = () => {
     setEditingProduct(null);
-    setFormData({ name: '', category: 'Coffee', price: 0, stock: 0 });
+    setFormData({ name: '', category: 'Coffee Based', price: 0, stock: 0 });
     setIsModalOpen(true);
   };
 
@@ -131,10 +131,10 @@ export const Inventory: React.FC = () => {
                     value={formData.category}
                     onChange={e => setFormData({...formData, category: e.target.value as Product['category']})}
                   >
-                    <option value="Coffee">Coffee</option>
-                    <option value="Non-Coffee">Non-Coffee</option>
+                    <option value="Coffee Based">Coffee Based</option>
+                    <option value="Non-Coffee Based">Non-Coffee Based</option>
                     <option value="Hot Espresso">Hot Espresso</option>
-                    <option value="Snack">Snack</option>
+                    <option value="Add Ons">Add Ons</option>
                   </select>
                 </div>
                 <div>
